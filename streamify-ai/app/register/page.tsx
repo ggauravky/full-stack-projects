@@ -1,75 +1,51 @@
 "use client";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-function RegisterPage() {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
 
-  const handleSumit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("passwords do not match");
-      return;
-    }
 
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-      const data = await res.json();
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-      if (!res.ok) {
-        throw new Error(data.error || "Registration failed");
-      }
-
-      console.log(data);
-      router.push("/login");
-    } catch (error) {
-      console.error(error);
+    if (result?.error) {
+      console.log(result.error);
+    } else {
+      router.push("/");
     }
   };
 
   return (
     <div>
-      <h1>Register</h1>
-      <form onSubmit={handleSumit}>
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
         <input
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
-          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
+        <button type="submit">Login</button>
       </form>
       <div>
-        <p>
-          Already have an account? <a href="/login">Login</a>
-        </p>
+        Don't have an account ?
+        <button onClick={() => router.push("/register")}>Register</button>
       </div>
     </div>
   );
 }
 
-export default RegisterPage;
+export default LoginPage;

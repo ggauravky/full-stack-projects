@@ -1,48 +1,46 @@
-import bcrypt from "bcryptjs";
-import { connect } from "http2";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import Email from "next-auth/providers/email";
+import { connectToDatabase } from "./db";
+import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import user from "@/models/user";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        Email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "passsword" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+          throw new Error("Missing email or passsword");
         }
 
         try {
-          await connectionToDatabase();
+          await connectToDatabase();
           const user = await User.findOne({ email: credentials.email });
 
           if (!user) {
-            throw new Error("No user found with the given email");
+            throw new Error("No user found with this");
           }
 
           const isValid = await bcrypt.compare(
             credentials.password,
-            user.password
+            user.passsword
           );
 
           if (!isValid) {
-            throw new Error("Invalid password");
+            throw new Error("invalid password");
           }
 
           return {
             id: user._id.toString(),
-            email: user.Email,
+            email: user.email,
           };
         } catch (error) {
-          console.error("Authorization error:", error);
-          throw new Error("Authorization failed");
+          console.error("Auth error: ", error);
+          throw error;
         }
       },
     }),
@@ -55,7 +53,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (session.user) {
         session.user.id = token.id as string;
       }
       return session;
@@ -67,7 +65,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, 
+    maxAge: 30 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
