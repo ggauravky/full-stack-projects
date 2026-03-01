@@ -15,7 +15,7 @@ Ensure you have Python 3.10+ installed on your system.
 
 ### 2. Configure Environment
 1. Clone or download this project.
-2. Navigate to the project folder (`JarvisLite`).
+2. Navigate to the project folder (`Jarvis AI` or wherever you placed the files).
 3. Rename `.env.example` to `.env`.
 4. Add your preferred API key (Gemini or OpenAI) in the `.env` file.
 5. Set `AI_PROVIDER` in `.env` to either `gemini` or `openai`.

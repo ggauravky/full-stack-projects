@@ -60,7 +60,7 @@ def health_check():
     return {"status": "ok", "assistant": config.ASSISTANT_NAME}
 
 @app.post("/chat", response_model=ResponseModel)
-async def chat_endpoint(request: ChatRequest):
+def chat_endpoint(request: ChatRequest):
     """Handles text input and routes it accordingly."""
     try:
         user_text = request.text.strip()
@@ -70,7 +70,7 @@ async def chat_endpoint(request: ChatRequest):
         logger.info(f"User input: {user_text}")
         
         # Route intent
-        result = await intent_router.route_intent(user_text)
+        result = intent_router.route_intent(user_text)
         
         # Optionally speak response in background (if configured to speak all responses)
         tts_engine.speak(result["response"], block=False)
@@ -90,7 +90,7 @@ async def chat_endpoint(request: ChatRequest):
         )
 
 @app.post("/voice", response_model=ResponseModel)
-async def voice_endpoint():
+def voice_endpoint():
     """Listens for voice, converts to text, and routes it."""
     try:
         logger.info("Listening for voice input...")
@@ -106,7 +106,7 @@ async def voice_endpoint():
         logger.info(f"Recognized Voice: {text}")
         
         # Route recognized text
-        result = await intent_router.route_intent(text)
+        result = intent_router.route_intent(text)
         
         # Speak the response
         tts_engine.speak(result["response"], block=False)

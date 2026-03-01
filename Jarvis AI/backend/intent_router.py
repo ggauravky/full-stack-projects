@@ -25,7 +25,7 @@ class IntentRouter:
             "search"
         ]
 
-    async def route_intent(self, text: str) -> Dict[str, Any]:
+    def route_intent(self, text: str) -> Dict[str, Any]:
         """
         Determines the intent of the text.
         Returns a dictionary with 'response' and 'source' ('command' or 'ai').
