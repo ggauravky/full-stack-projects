@@ -1,0 +1,59 @@
+#root {
+  min-height: 100vh;
+}
+
+.input {
+  @apply w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-white font-medium shadow-sm hover:opacity-90 transition;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2 text-white font-medium shadow-sm hover:opacity-90 transition;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-slate-700 font-medium bg-white hover:bg-slate-50 transition;
+}
+
+.nav-btn {
+  @apply px-3 py-1 rounded-md border border-transparent hover:border-slate-200 hover:bg-slate-50;
+}
+
+.section {
+  @apply bg-white p-6 rounded-2xl shadow-sm border border-slate-100;
+}
+
+.section-head {
+  @apply mb-4;
+}
+
+.section-title {
+  @apply text-xl font-semibold text-slate-900;
+}
+
+.section-hint {
+  @apply text-sm text-slate-500;
+}
+
+.form-grid {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.form-field {
+  @apply grid gap-1 text-sm text-slate-700;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold;
+}
+
+.feature-card {
+  @apply bg-white border border-slate-100 rounded-xl p-4 shadow-sm;
+}
+
+.list-card {
+  @apply border border-slate-100 rounded-lg p-3 bg-slate-50;
+}
