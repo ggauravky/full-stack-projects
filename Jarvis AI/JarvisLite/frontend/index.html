@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JarvisLite - AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="assistant-info">
+                <div class="avatar" id="status-indicator">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="details">
+                    <h1>JarvisLite</h1>
+                    <span class="status-text" id="connection-status">Connecting...</span>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="theme-toggle" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <main class="chat-box" id="chat-box">
+            <!-- Messages will be injected here -->
+            <div class="message system startup">
+                Initializing JarvisLite systems...
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="chat-input-area">
+            <form id="chat-form" class="input-form">
+                <button type="button" id="mic-btn" class="icon-btn mic-btn" title="Hold to speak">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" placeholder="Type a message or command..." autocomplete="off">
+                </div>
+                <button type="submit" id="send-btn" class="icon-btn send-btn" title="Send message">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+            <div class="recording-indicator hidden" id="recording-toast">
+                <span class="pulse"></span> Listening...
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
