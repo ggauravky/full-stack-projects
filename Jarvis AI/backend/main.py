@@ -59,6 +59,11 @@ def health_check():
     """Health check endpoint to ensure server is running smoothly."""
     return {"status": "ok", "assistant": config.ASSISTANT_NAME}
 
+@app.get("/favicon.ico", status_code=204)
+def favicon():
+    """Dummy favicon endpoint to prevent 404 errors."""
+    return {}
+
 @app.post("/chat", response_model=ResponseModel)
 def chat_endpoint(request: ChatRequest):
     """Handles text input and routes it accordingly."""

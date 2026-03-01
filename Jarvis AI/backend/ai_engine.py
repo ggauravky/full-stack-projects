@@ -15,7 +15,7 @@ class AIEngine:
             if self.provider == "gemini":
                 if config.GEMINI_API_KEY:
                     genai.configure(api_key=config.GEMINI_API_KEY)
-                    self.gemini_model = genai.GenerativeModel('gemini-1.5-flash-latest')
+                    self.gemini_model = genai.GenerativeModel('gemini-2.5-flash')
                 else:
                     logger.warning("Gemini initialized but API key is missing.")
             else:
