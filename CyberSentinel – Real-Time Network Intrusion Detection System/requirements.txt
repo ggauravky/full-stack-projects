@@ -1,0 +1,10 @@
+# CyberSentinel - Real-Time Network Intrusion Detection System
+# Core Dependencies
+
+scapy>=2.5.0          # Packet capture and analysis
+flask>=3.0.0          # Web dashboard server
+pandas>=2.1.0         # Data manipulation for traffic analysis
+pyyaml>=6.0           # Configuration file parsing
+scikit-learn>=1.3.0   # Anomaly detection (optional advanced)
+colorama>=0.4.6       # Colored terminal output (Windows support)
+pytest>=7.4.0         # Testing framework

@@ -1,0 +1,81 @@
+# ============================================================
+# CyberSentinel - Configuration File
+# ============================================================
+# Adjust these thresholds based on your network environment.
+# Lower thresholds = more sensitive detection (more alerts).
+# Higher thresholds = less noise (fewer false positives).
+# ============================================================
+
+# ---- Sniffer Settings ----
+sniffer:
+  # Network interface to sniff on (null = auto-detect default)
+  interface: null
+  # BPF filter for packet capture (e.g., "tcp", "udp", "port 80")
+  filter: null
+  # Maximum packets to capture (0 = unlimited)
+  max_packets: 0
+
+# ---- Detection Thresholds ----
+detection:
+  # Port Scan Detection
+  port_scan:
+    # Number of unique ports accessed by a single IP to trigger alert
+    threshold: 15
+    # Time window in seconds to track port access
+    time_window: 60
+
+  # Traffic Spike Detection
+  traffic_spike:
+    # Maximum packets per second before triggering alert
+    threshold: 100
+    # Time window in seconds for rate calculation
+    time_window: 10
+
+  # Anomaly Detection
+  anomaly:
+    # Standard deviation multiplier for anomaly flagging
+    std_dev_multiplier: 2.5
+    # Minimum number of samples before anomaly detection activates
+    min_samples: 30
+
+  # Unknown IP Detection
+  unknown_ip:
+    # Enable/disable unknown IP alerts
+    enabled: true
+    # List of trusted/known IP addresses (add your network IPs here)
+    trusted_ips:
+      - "127.0.0.1"
+      - "192.168.1.1"
+      - "192.168.1.0/24"
+      - "10.0.0.0/8"
+
+# ---- Alert Settings ----
+alerts:
+  # Maximum number of alerts to keep in memory for dashboard
+  max_in_memory: 500
+  # Cooldown in seconds before re-alerting the same threat type from same IP
+  cooldown: 30
+  # Log file path (relative to project root)
+  log_file: "data/alerts.log"
+
+# ---- Dashboard Settings ----
+dashboard:
+  # Enable/disable the web dashboard
+  enabled: true
+  # Host to bind the dashboard server
+  host: "0.0.0.0"
+  # Port for the dashboard server
+  port: 5000
+  # Auto-refresh interval in milliseconds for the dashboard
+  refresh_interval: 3000
+
+# ---- Logging Settings ----
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
+  # Log file for application logs
+  log_file: "data/cybersentinel.log"
+  # Maximum log file size in bytes (5 MB)
+  max_file_size: 5242880
+  # Number of backup log files to keep
+  backup_count: 3

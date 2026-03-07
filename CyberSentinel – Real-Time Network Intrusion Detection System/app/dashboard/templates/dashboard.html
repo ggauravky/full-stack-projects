@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSentinel — Network Intrusion Detection</title>
+    <meta name="description" content="Real-Time Network Intrusion Detection System Dashboard">
+    <style>
+        /* ─── CSS Reset & Variables ─── */
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2235;
+            --bg-card-hover: #1f2a40;
+            --border: #2a3548;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --glow-cyan: rgba(6, 182, 212, 0.15);
+            --glow-red: rgba(239, 68, 68, 0.15);
+            --radius: 12px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── Animated Background ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            position: relative;
+            z-index: 1;
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 0 8px var(--accent-cyan));
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .pulse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        }
+
+        /* ─── Main Content ─── */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 28px 32px;
+        }
+
+        /* ─── Stats Grid ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); }
+        .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent-red), var(--accent-yellow)); }
+        .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent-yellow), var(--accent-green)); }
+        .stat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); }
+
+        .stat-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            letter-spacing: -1px;
+        }
+
+        .stat-card:nth-child(1) .stat-value { color: var(--accent-cyan); }
+        .stat-card:nth-child(2) .stat-value { color: var(--accent-red); }
+        .stat-card:nth-child(3) .stat-value { color: var(--accent-yellow); }
+        .stat-card:nth-child(4) .stat-value { color: var(--accent-purple); }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-family: var(--font-mono);
+        }
+
+        /* ─── Two Column Layout ─── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        /* ─── Panel Styles ─── */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 22px;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(26, 34, 53, 0.5);
+        }
+
+        .panel-body {
+            padding: 0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Custom Scrollbar */
+        .panel-body::-webkit-scrollbar { width: 6px; }
+        .panel-body::-webkit-scrollbar-track { background: transparent; }
+        .panel-body::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        .panel-body::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* ─── Alerts Table ─── */
+        .alert-table { width: 100%; border-collapse: collapse; }
+
+        .alert-table th {
+            padding: 12px 18px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            background: rgba(26, 34, 53, 0.3);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .alert-table td {
+            padding: 12px 18px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(42, 53, 72, 0.5);
+            vertical-align: middle;
+        }
+
+        .alert-table tr {
+            transition: background 0.2s ease;
+        }
+
+        .alert-table tr:hover {
+            background: rgba(6, 182, 212, 0.04);
+        }
+
+        .time-cell {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Severity Badges */
+        .severity-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sev-low {
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .sev-medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .sev-high {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .sev-critical {
+            background: rgba(239, 68, 68, 0.25);
+            color: #ff6b6b;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .threat-type {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .ip-cell {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .detail-cell {
+            color: var(--text-secondary);
+            font-size: 12px;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* ─── Suspicious IPs List ─── */
+        .ip-list { list-style: none; }
+
+        .ip-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 22px;
+            border-bottom: 1px solid rgba(42, 53, 72, 0.5);
+            transition: background 0.2s ease;
+        }
+
+        .ip-item:hover {
+            background: rgba(239, 68, 68, 0.04);
+        }
+
+        .ip-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ip-address {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-red);
+        }
+
+        .ip-threats {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .ip-count {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-yellow);
+        }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            padding: 48px 24px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        /* ─── Footer ─── */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 32px;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .main-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .header { flex-direction: column; gap: 12px; padding: 16px; }
+            .container { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ Header ═══ -->
+    <header class="header">
+        <div class="header-left">
+            <span class="logo-icon">🛡️</span>
+            <span class="logo">CyberSentinel</span>
+        </div>
+        <div id="statusBadge" class="status-badge status-active">
+            <span class="pulse-dot"></span>
+            <span id="statusText">Monitoring Active</span>
+        </div>
+    </header>
+
+    <!-- ═══ Main Content ═══ -->
+    <div class="container">
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Packets Captured</div>
+                <div class="stat-value" id="packetCount">0</div>
+                <div class="stat-sub" id="packetRate">0 pps</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Alerts</div>
+                <div class="stat-value" id="alertCount">0</div>
+                <div class="stat-sub" id="alertBreakdown">No alerts yet</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Suspicious IPs</div>
+                <div class="stat-value" id="suspiciousCount">0</div>
+                <div class="stat-sub">unique addresses flagged</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Threat Types</div>
+                <div class="stat-value" id="threatTypeCount">0</div>
+                <div class="stat-sub" id="threatTypes">-</div>
+            </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="main-grid">
+
+            <!-- Recent Alerts Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    🚨 Recent Security Alerts
+                </div>
+                <div class="panel-body" id="alertsPanel">
+                    <div class="empty-state">
+                        <div class="empty-icon">🔒</div>
+                        <div class="empty-text">No alerts detected yet. Network is clean.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suspicious IPs Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    ⚠️ Suspicious IPs
+                </div>
+                <div class="panel-body" id="ipsPanel">
+                    <div class="empty-state">
+                        <div class="empty-icon">✅</div>
+                        <div class="empty-text">No suspicious IPs detected.</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        CyberSentinel v1.0 — Real-Time Network Intrusion Detection System — Auto-refreshes every 3s
+    </footer>
+
+    <!-- ═══ JavaScript: Auto-Refresh via API Polling ═══ -->
+    <script>
+        // Track previous packet count for rate calculation
+        let prevPacketCount = 0;
+        let prevTimestamp = Date.now();
+
+        /**
+         * Fetch real-time stats from the API and update the dashboard.
+         */
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/stats');
+                if (!response.ok) throw new Error('API request failed');
+                const data = await response.json();
+
+                // ── Update Status Badge ──
+                const badge = document.getElementById('statusBadge');
+                const statusText = document.getElementById('statusText');
+                if (data.sniffer_running) {
+                    badge.className = 'status-badge status-active';
+                    statusText.textContent = 'Monitoring Active';
+                } else {
+                    badge.className = 'status-badge status-inactive';
+                    statusText.textContent = 'Sniffer Stopped';
+                }
+
+                // ── Update Packet Count ──
+                const packetCount = data.packet_count || 0;
+                document.getElementById('packetCount').textContent =
+                    packetCount.toLocaleString();
+
+                // Calculate packets per second
+                const now = Date.now();
+                const elapsed = (now - prevTimestamp) / 1000;
+                const rate = elapsed > 0 ? ((packetCount - prevPacketCount) / elapsed) : 0;
+                document.getElementById('packetRate').textContent =
+                    `${rate.toFixed(1)} pps`;
+                prevPacketCount = packetCount;
+                prevTimestamp = now;
+
+                // ── Update Alert Count ──
+                const totalAlerts = data.alerts?.total || 0;
+                document.getElementById('alertCount').textContent =
+                    totalAlerts.toLocaleString();
+
+                // Alert breakdown by severity
+                const bySeverity = data.alerts?.by_severity || {};
+                const sevParts = Object.entries(bySeverity)
+                    .map(([sev, cnt]) => `${sev}: ${cnt}`)
+                    .join(' · ');
+                document.getElementById('alertBreakdown').textContent =
+                    sevParts || 'No alerts yet';
+
+                // ── Update Suspicious IPs ──
+                const suspiciousIps = data.suspicious_ips || [];
+                document.getElementById('suspiciousCount').textContent =
+                    suspiciousIps.length;
+
+                // ── Update Threat Types ──
+                const byType = data.alerts?.by_type || {};
+                const typeKeys = Object.keys(byType);
+                document.getElementById('threatTypeCount').textContent =
+                    typeKeys.length;
+                document.getElementById('threatTypes').textContent =
+                    typeKeys.join(', ') || '-';
+
+                // ── Render Alerts Table ──
+                renderAlerts(data.recent_alerts || []);
+
+                // ── Render Suspicious IPs ──
+                renderSuspiciousIPs(suspiciousIps);
+
+            } catch (error) {
+                console.error('Dashboard update error:', error);
+            }
+        }
+
+        /**
+         * Render the recent alerts table.
+         */
+        function renderAlerts(alerts) {
+            const panel = document.getElementById('alertsPanel');
+
+            if (alerts.length === 0) {
+                panel.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔒</div>
+                        <div class="empty-text">No alerts detected yet. Network is clean.</div>
+                    </div>`;
+                return;
+            }
+
+            const severityClass = {
+                'LOW': 'sev-low',
+                'MEDIUM': 'sev-medium',
+                'HIGH': 'sev-high',
+                'CRITICAL': 'sev-critical'
+            };
+
+            let html = `
+                <table class="alert-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Type</th>
+                            <th>Severity</th>
+                            <th>Source IP</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            alerts.forEach(alert => {
+                html += `
+                    <tr>
+                        <td class="time-cell">${alert.time_str || '-'}</td>
+                        <td><span class="threat-type">${alert.threat_type || '-'}</span></td>
+                        <td><span class="severity-badge ${severityClass[alert.severity] || 'sev-low'}">${alert.severity || '-'}</span></td>
+                        <td class="ip-cell">${alert.src_ip || '-'}</td>
+                        <td class="detail-cell" title="${alert.details || ''}">${alert.details || '-'}</td>
+                    </tr>`;
+            });
+
+            html += `</tbody></table>`;
+            panel.innerHTML = html;
+        }
+
+        /**
+         * Render the suspicious IPs list.
+         */
+        function renderSuspiciousIPs(ips) {
+            const panel = document.getElementById('ipsPanel');
+
+            if (ips.length === 0) {
+                panel.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✅</div>
+                        <div class="empty-text">No suspicious IPs detected.</div>
+                    </div>`;
+                return;
+            }
+
+            let html = '<ul class="ip-list">';
+            ips.forEach(ipInfo => {
+                html += `
+                    <li class="ip-item">
+                        <div class="ip-info">
+                            <span class="ip-address">${ipInfo.ip}</span>
+                            <span class="ip-threats">${(ipInfo.threat_types || []).join(', ')}</span>
+                        </div>
+                        <span class="ip-count">${ipInfo.alert_count}</span>
+                    </li>`;
+            });
+            html += '</ul>';
+            panel.innerHTML = html;
+        }
+
+        // Initial load and start polling
+        updateDashboard();
+        setInterval(updateDashboard, 3000);
+    </script>
+</body>
+</html>
